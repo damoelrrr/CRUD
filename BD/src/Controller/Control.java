@@ -1,14 +1,19 @@
 package Controller;
 
+import Model.ArticuloDAO;
 import View.Menu;
+import View.VentanaArticuloDatos;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Control {
+
     private Menu menu;
+    private ArticuloDAO articuloDAO;
 
     public Control() {
         menu = new Menu();
+        articuloDAO = new ArticuloDAO();
         menu.agregarListener(new GestorAcciones());
     }
 
@@ -20,6 +25,7 @@ public class Control {
      * Clase interna para manejar las acciones del menú
      */
     private class GestorAcciones implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent e) {
             String comando = e.getActionCommand();
@@ -35,9 +41,7 @@ public class Control {
                 onArticuloEliminar();
             } else if (comando.equals("articulo_buscar")) {
                 onArticuloBuscar();
-            }
-
-            // Acciones para Autores
+            } // Acciones para Autores
             else if (comando.equals("autor_crear")) {
                 onAutorCrear();
             } else if (comando.equals("autor_ver")) {
@@ -48,9 +52,7 @@ public class Control {
                 onAutorEliminar();
             } else if (comando.equals("autor_buscar")) {
                 onAutorBuscar();
-            }
-
-            // Acciones para Revistas
+            } // Acciones para Revistas
             else if (comando.equals("revista_crear")) {
                 onRevistaCrear();
             } else if (comando.equals("revista_ver")) {
@@ -61,9 +63,7 @@ public class Control {
                 onRevistaEliminar();
             } else if (comando.equals("revista_buscar")) {
                 onRevistaBuscar();
-            }
-
-            // Acciones para Temas
+            } // Acciones para Temas
             else if (comando.equals("tema_crear")) {
                 onTemaCrear();
             } else if (comando.equals("tema_ver")) {
@@ -72,9 +72,7 @@ public class Control {
                 onTemaActualizar();
             } else if (comando.equals("tema_eliminar")) {
                 onTemaEliminar();
-            }
-
-            // Acciones para Palabras Clave
+            } // Acciones para Palabras Clave
             else if (comando.equals("palabra_crear")) {
                 onPalabraCrear();
             } else if (comando.equals("palabra_ver")) {
@@ -83,9 +81,7 @@ public class Control {
                 onPalabraActualizar();
             } else if (comando.equals("palabra_eliminar")) {
                 onPalabraEliminar();
-            }
-
-            // Acciones de Ayuda
+            } // Acciones de Ayuda
             else if (comando.equals("ayuda_acercade")) {
                 onAcercaDe();
             } else if (comando.equals("salir")) {
@@ -96,7 +92,10 @@ public class Control {
 
     // ============ MÉTODOS PARA ARTÍCULOS ============
     private void onArticuloCrear() {
-        // TODO: Llamar a métodos del modelo para crear un artículo
+        // TODO: Llamar a métodos del modelo para crear un artículo  
+        VentanaArticuloDatos v = new VentanaArticuloDatos(menu);
+        v.setVisible(true);
+
     }
 
     private void onArticuloVer() {
@@ -201,4 +200,3 @@ public class Control {
         System.exit(0);
     }
 }
-
