@@ -1,141 +1,143 @@
 package View;
 
 import Model.Articulo;
-import Model.Autor;
 import Model.Revista;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class VentanaArticuloDatos extends JDialog {
 
     private JTextField txtTitulo;
     private JTextField txtAnio;
     private JTextField txtRevista;
-    private JTextField txtPalabrasClave;
-    private JPanel panelAutores;
-    private List<JTextField> camposAutores;
-    private JButton btnAgregarAutor;
-    private JButton btnContinuar;
-    private Articulo articulo; // objeto en memoria
+    private JTextField txtAutores;
+    private JTextField txtPalabras;
+
+    private JButton btnSiguiente;
+    private JButton btnCancelar;
+
+    private Articulo articulo;
 
     public VentanaArticuloDatos(JFrame parent) {
-        super(parent, "Nuevo Artículo - Datos Generales", true);
+        super(parent, "Datos del Artículo", true);
         articulo = new Articulo();
-        camposAutores = new ArrayList<>();
+        inicializar(parent);
+    }
 
-        setSize(600, 500);
+    public VentanaArticuloDatos(JFrame parent, Articulo articuloExistente) {
+        super(parent, "Actualizar Artículo", true);
+        this.articulo = articuloExistente;
+        inicializar(parent);
+        cargarDatos();
+    }
+
+    private void inicializar(JFrame parent) {
+
+        setSize(500, 400);
         setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
-        c.fill = GridBagConstraints.HORIZONTAL;
+        JPanel panelCampos = new JPanel(new GridLayout(5, 2, 10, 10));
+        panelCampos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Título
-        c.gridx = 0;
-        c.gridy = 0;
-        panel.add(new JLabel("Título del artículo:"), c);
-
+        panelCampos.add(new JLabel("Título:"));
         txtTitulo = new JTextField();
-        c.gridx = 1;
-        panel.add(txtTitulo, c);
+        panelCampos.add(txtTitulo);
 
-        // Autores
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(new JLabel("Autores:"), c);
-
-        panelAutores = new JPanel();
-        panelAutores.setLayout(new BoxLayout(panelAutores, BoxLayout.Y_AXIS));
-
-        agregarCampoAutor(); // mínimo 1 autor
-
-        btnAgregarAutor = new JButton("+");
-        btnAgregarAutor.setForeground(Color.BLUE);
-        btnAgregarAutor.setMargin(new Insets(2, 8, 2, 8));
-        btnAgregarAutor.addActionListener(e -> agregarCampoAutor());
-
-        JPanel autoresWrapper = new JPanel(new BorderLayout());
-        autoresWrapper.add(panelAutores, BorderLayout.CENTER);
-        autoresWrapper.add(btnAgregarAutor, BorderLayout.EAST);
-
-        c.gridx = 1;
-        panel.add(autoresWrapper, c);
-
-        // Año
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(new JLabel("Año de publicación:"), c);
-
+        panelCampos.add(new JLabel("Año de publicación:"));
         txtAnio = new JTextField();
-        c.gridx = 1;
-        panel.add(txtAnio, c);
+        panelCampos.add(txtAnio);
 
-        // Revista
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(new JLabel("Revista de publicación:"), c);
-
+        panelCampos.add(new JLabel("Revista:"));
         txtRevista = new JTextField();
-        c.gridx = 1;
-        panel.add(txtRevista, c);
+        panelCampos.add(txtRevista);
 
-        // Palabras clave
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(new JLabel("Palabras clave:"), c);
+        panelCampos.add(new JLabel("Autores (separados por coma):"));
+        txtAutores = new JTextField();
+        panelCampos.add(txtAutores);
 
-        txtPalabrasClave = new JTextField();
-        c.gridx = 1;
-        panel.add(txtPalabrasClave, c);
+        panelCampos.add(new JLabel("Palabras clave (separadas por coma):"));
+        txtPalabras = new JTextField();
+        panelCampos.add(txtPalabras);
 
-        // Botón continuar
-        btnContinuar = new JButton("Guardar y continuar");
-        btnContinuar.addActionListener(e -> continuar());
+        add(panelCampos, BorderLayout.CENTER);
 
-        JPanel panelBoton = new JPanel();
-        panelBoton.add(btnContinuar);
+        btnSiguiente = new JButton("Siguiente");
+        btnCancelar = new JButton("Cancelar");
 
-        add(panel, BorderLayout.CENTER);
-        add(panelBoton, BorderLayout.SOUTH);
+        btnSiguiente.addActionListener(e -> siguiente());
+        btnCancelar.addActionListener(e -> cancelar());
+
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelBotones.add(btnCancelar);
+        panelBotones.add(btnSiguiente);
+
+        add(panelBotones, BorderLayout.SOUTH);
     }
 
-    private void agregarCampoAutor() {
-        JTextField txtAutor = new JTextField(20);
-        camposAutores.add(txtAutor);
-        panelAutores.add(txtAutor);
-        panelAutores.revalidate();
-        panelAutores.repaint();
+    private void cargarDatos() {
+        txtTitulo.setText(articulo.getTitulo());
+        txtAnio.setText(String.valueOf(articulo.getAnio()));
+        txtRevista.setText(articulo.getRevista().getNombre());
+        txtAutores.setText(articulo.getAutoresTexto());
+        txtPalabras.setText(articulo.getPalabrasTexto());
     }
 
-    private void continuar() {
-        if (txtTitulo.getText().isEmpty() || camposAutores.get(0).getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe ingresar al menos un título y un autor",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+    private void siguiente() {
+
+        if (txtTitulo.getText().isEmpty()
+                || txtAnio.getText().isEmpty()
+                || txtRevista.getText().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe completar al menos Título, Año y Revista",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
 
-        articulo.setTitulo(txtTitulo.getText());
-        articulo.setAnio(Integer.parseInt(txtAnio.getText()));
-        articulo.setRevista(new Revista(0, txtRevista.getText()));
-        articulo.setResumen(""); // se llena después
+        try {
+            articulo.setTitulo(txtTitulo.getText());
+            articulo.setAnio(Integer.parseInt(txtAnio.getText()));
 
-        // Autores
-        for (JTextField campo : camposAutores) {
-            if (!campo.getText().isEmpty()) {
-                // aquí luego se guardan en BD
-            }
+            Revista revista = new Revista();
+            revista.setNombre(txtRevista.getText());
+            articulo.setRevista(revista);
+
+            articulo.setAutoresTexto(txtAutores.getText());
+            articulo.setPalabrasTexto(txtPalabras.getText());
+
+            VentanaArticuloResumen resumen =
+                    new VentanaArticuloResumen(
+                            (JFrame) getParent(),
+                            articulo,
+                            this
+                    );
+
+            resumen.setVisible(true);
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El año debe ser un número válido",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
+    }
 
-        VentanaArticuloResumen resumen = new VentanaArticuloResumen((JFrame) getParent(), articulo, this);
-        resumen.setVisible(true);
-        setVisible(false);
+    private void cancelar() {
+        int op = JOptionPane.showConfirmDialog(
+                this,
+                "¿Desea cancelar el registro del artículo?",
+                "Confirmación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (op == JOptionPane.YES_OPTION) {
+            dispose();
+        }
     }
 }
-
-

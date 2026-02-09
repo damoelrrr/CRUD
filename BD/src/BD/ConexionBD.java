@@ -8,7 +8,7 @@ public class ConexionBD {
 
     private static final String URL = "jdbc:mysql://localhost:3306/articulos_db";
     private static final String USER = "root";
-    private static final String PASSWORD = ""; // coloca tu contraseña si tienes
+    private static final String PASSWORD = ""; 
 
     public static Connection getConexion() {
         Connection conexion = null;

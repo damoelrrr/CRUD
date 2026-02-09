@@ -1,8 +1,15 @@
 package View;
 
+import BD.ConexionBD;
 import Model.Articulo;
 import Model.ArticuloDAO;
+import Model.AutorDAO;
+import Model.PalabraClaveDAO;
+import Model.Revista;
 import Model.RevistaDAO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +32,6 @@ public class VentanaArticuloResumen extends JDialog {
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
 
-        // Botón cancelar arriba
         btnCancelar = new JButton("Cancelar y salir");
         btnCancelar.addActionListener(e -> cancelar());
 
@@ -33,7 +39,6 @@ public class VentanaArticuloResumen extends JDialog {
         panelTop.add(btnCancelar);
         add(panelTop, BorderLayout.NORTH);
 
-        // Área de resumen
         txtResumen = new JTextArea(10, 40);
         txtResumen.setLineWrap(true);
         txtResumen.setWrapStyleWord(true);
@@ -44,7 +49,6 @@ public class VentanaArticuloResumen extends JDialog {
 
         add(new JScrollPane(txtResumen), BorderLayout.CENTER);
 
-        // Botón guardar abajo
         btnGuardar = new JButton("Guardar");
         btnGuardar.addActionListener(e -> guardar());
 
@@ -54,29 +58,40 @@ public class VentanaArticuloResumen extends JDialog {
         add(panelBotones, BorderLayout.SOUTH);
     }
 
-    // Guardar artículo completo
     private void guardar() {
+articulo.setResumen(txtResumen.getText());
 
-        articulo.setResumen(txtResumen.getText());
-
-        // Obtener o crear revista
-        RevistaDAO revistaDAO = new RevistaDAO();
-        String nombreRevista = articulo.getRevista().getNombre();
-        int idRevista = revistaDAO.obtenerOCrear(nombreRevista);
-
-        articulo.getRevista().setId(idRevista);
-
-        // Guardar artículo
         ArticuloDAO dao = new ArticuloDAO();
-        dao.insertar(articulo);
 
-        JOptionPane.showMessageDialog(this, "Artículo guardado correctamente");
+        if (articulo.getId() == 0) {
+            dao.insertar(articulo);   // NUEVO
+        } else {
+            dao.actualizar(articulo); // ACTUALIZAR
+        }
 
-        ventanaAnterior.dispose(); // cerrar ventana datos
-        dispose();                 // cerrar resumen
+        JOptionPane.showMessageDialog(
+                this,
+                "Artículo guardado correctamente",
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        ventanaAnterior.dispose();
+        dispose();
     }
 
-    // Cancelar y salir
+
+    private void insertarArticuloAutor(int idArticulo, int idAutor) {
+        String sql = "INSERT INTO articulo_autor(id_articulo, id_autor) VALUES (?, ?)";
+        try (Connection con = ConexionBD.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idArticulo);
+            ps.setInt(2, idAutor);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error articulo_autor: " + e.getMessage());
+        }
+    }
+
     private void cancelar() {
         int op = JOptionPane.showConfirmDialog(
                 this,

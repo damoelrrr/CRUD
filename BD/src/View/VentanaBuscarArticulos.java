@@ -21,8 +21,7 @@ public class VentanaBuscarArticulos extends JDialog {
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
 
-        // 🔍 Panel búsqueda
-        JPanel panelTop = new JPanel(new BorderLayout());
+        JPanel panelTop = new JPanel(new BorderLayout(5, 5));
         txtBuscar = new JTextField();
         JButton btnBuscar = new JButton("Buscar");
 
@@ -34,7 +33,6 @@ public class VentanaBuscarArticulos extends JDialog {
 
         add(panelTop, BorderLayout.NORTH);
 
-        // 📄 Resultados
         panelResultados = new JPanel();
         panelResultados.setLayout(new BoxLayout(panelResultados, BoxLayout.Y_AXIS));
 
@@ -51,8 +49,13 @@ public class VentanaBuscarArticulos extends JDialog {
 
         List<Articulo> lista = dao.buscarPorTitulo(filtro);
 
-        for (Articulo a : lista) {
-            panelResultados.add(crearPanelArticulo(a));
+        if (lista.isEmpty()) {
+            panelResultados.add(new JLabel("No se encontraron artículos."));
+        } else {
+            for (Articulo a : lista) {
+                panelResultados.add(crearPanelArticulo(a));
+                panelResultados.add(Box.createVerticalStrut(10));
+            }
         }
 
         panelResultados.revalidate();
@@ -61,28 +64,60 @@ public class VentanaBuscarArticulos extends JDialog {
 
     private JPanel crearPanelArticulo(Articulo a) {
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
 
-        panel.add(new JLabel("Título: " + a.getTitulo()));
-        panel.add(new JLabel("Año de publicación: " + a.getAnio()));
-        panel.add(new JLabel("Autores: " + a.getAutoresTexto()));
-        panel.add(new JLabel("Palabras clave: " + a.getPalabrasTexto()));
-        panel.add(new JLabel("Revista: " + a.getRevista().getNombre()));
+        JTextArea info = new JTextArea();
+        info.setEditable(false);
+        info.setLineWrap(true);
+        info.setWrapStyleWord(true);
+        info.setBackground(Color.WHITE);
 
-        JTextArea resumen = new JTextArea(a.getResumen());
-        resumen.setLineWrap(true);
-        resumen.setWrapStyleWord(true);
-        resumen.setEditable(false);
-        resumen.setBackground(new Color(245, 245, 245));
+        info.setText(
+                "Título: " + a.getTitulo() + "\n" +
+                "Año de publicación: " + a.getAnio() + "\n" +
+                "Autores: " + a.getAutoresTexto() + "\n" +
+                "Palabras clave: " + a.getPalabrasTexto() + "\n" +
+                "Revista: " + a.getRevista().getNombre() + "\n\n" +
+                "Resumen:\n" + a.getResumen()
+        );
 
-        panel.add(new JLabel("Resumen:"));
-        panel.add(resumen);
+        panel.add(info, BorderLayout.CENTER);
 
-        panel.add(Box.createVerticalStrut(10));
+        JButton btnEliminar = new JButton("Eliminar");
+        JButton btnActualizar = new JButton("Actualizar");
+
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnActualizar);
+
+        panel.add(panelBotones, BorderLayout.SOUTH);
+
+        btnEliminar.addActionListener(e -> eliminarArticulo(a));
+        btnActualizar.addActionListener(e -> actualizarArticulo(a));
 
         return panel;
+    }
+
+    private void eliminarArticulo(Articulo articulo) {
+        int op = JOptionPane.showConfirmDialog(
+                this,
+                "¿Desea eliminar este artículo?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (op == JOptionPane.YES_OPTION) {
+            dao.eliminar(articulo.getId());
+            cargarArticulos();
+        }
+    }
+
+    private void actualizarArticulo(Articulo articulo) {
+        VentanaArticuloDatos ventana =
+                new VentanaArticuloDatos((JFrame) getParent(), articulo);
+        ventana.setVisible(true);
+        cargarArticulos();
     }
 }
