@@ -1,6 +1,8 @@
-package Model;
+package DAO;
 
 import BD.ConexionBD;
+import Model.Articulo;
+import Model.Revista;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

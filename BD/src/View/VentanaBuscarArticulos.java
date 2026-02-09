@@ -1,7 +1,7 @@
 package View;
 
 import Model.Articulo;
-import Model.ArticuloDAO;
+import DAO.ArticuloDAO;
 
 import javax.swing.*;
 import java.awt.*;

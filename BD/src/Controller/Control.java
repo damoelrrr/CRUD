@@ -1,6 +1,6 @@
 package Controller;
 
-import Model.ArticuloDAO;
+import DAO.ArticuloDAO;
 import View.Menu;
 import View.VentanaArticuloDatos;
 import View.VentanaBuscarArticulos;

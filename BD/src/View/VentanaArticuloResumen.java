@@ -2,11 +2,11 @@ package View;
 
 import BD.ConexionBD;
 import Model.Articulo;
-import Model.ArticuloDAO;
-import Model.AutorDAO;
-import Model.PalabraClaveDAO;
+import DAO.ArticuloDAO;
+import DAO.AutorDAO;
+import DAO.PalabraClaveDAO;
 import Model.Revista;
-import Model.RevistaDAO;
+import DAO.RevistaDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

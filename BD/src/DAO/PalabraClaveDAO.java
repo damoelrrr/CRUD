@@ -1,19 +1,19 @@
-package Model;
+package DAO;
 
 import BD.ConexionBD;
 import java.sql.*;
 
-public class AutorDAO {
+public class PalabraClaveDAO {
 
-    public int obtenerOCrear(String nombre) {
+    public int obtenerOCrear(String palabra) {
 
-        String buscar = "SELECT id FROM autor WHERE nombre = ?";
-        String insertar = "INSERT INTO autor(nombre) VALUES (?)";
+        String buscar = "SELECT id FROM palabra_clave WHERE palabra = ?";
+        String insertar = "INSERT INTO palabra_clave(palabra) VALUES (?)";
 
         try (Connection con = ConexionBD.getConexion()) {
 
             PreparedStatement ps = con.prepareStatement(buscar);
-            ps.setString(1, nombre.trim());
+            ps.setString(1, palabra.trim());
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -22,7 +22,7 @@ public class AutorDAO {
 
             PreparedStatement psInsert =
                     con.prepareStatement(insertar, Statement.RETURN_GENERATED_KEYS);
-            psInsert.setString(1, nombre.trim());
+            psInsert.setString(1, palabra.trim());
             psInsert.executeUpdate();
 
             ResultSet keys = psInsert.getGeneratedKeys();
@@ -31,7 +31,7 @@ public class AutorDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("AutorDAO error: " + e.getMessage());
+            System.out.println("PalabraClaveDAO error: " + e.getMessage());
         }
         return -1;
     }
