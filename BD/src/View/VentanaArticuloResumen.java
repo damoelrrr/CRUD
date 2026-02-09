@@ -58,27 +58,65 @@ public class VentanaArticuloResumen extends JDialog {
         add(panelBotones, BorderLayout.SOUTH);
     }
 
-    private void guardar() {
-articulo.setResumen(txtResumen.getText());
+   private void guardar() {
 
-        ArticuloDAO dao = new ArticuloDAO();
+    articulo.setResumen(txtResumen.getText());
 
-        if (articulo.getId() == 0) {
-            dao.insertar(articulo);   // NUEVO
-        } else {
-            dao.actualizar(articulo); // ACTUALIZAR
-        }
+    RevistaDAO revistaDAO = new RevistaDAO();
+    AutorDAO autorDAO = new AutorDAO();
+    PalabraClaveDAO palabraDAO = new PalabraClaveDAO();
+    ArticuloDAO articuloDAO = new ArticuloDAO();
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Artículo guardado correctamente",
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+    // 1. Obtener o crear revista
+    int idRevista = revistaDAO.obtenerOCrear(
+            articulo.getRevista().getNombre()
+    );
+    articulo.getRevista().setId(idRevista);
 
-        ventanaAnterior.dispose();
-        dispose();
+    // 2. Insertar o actualizar artículo
+    int idArticulo;
+    if (articulo.getId() == 0) {
+        idArticulo = articuloDAO.insertar(articulo);
+        articulo.setId(idArticulo);
+    } else {
+        articuloDAO.actualizar(articulo);
+        idArticulo = articulo.getId();
     }
+
+    // 3. Guardar autores
+    if (articulo.getAutoresTexto() != null
+            && !articulo.getAutoresTexto().isBlank()) {
+
+        String[] autores = articulo.getAutoresTexto().split(",");
+
+        for (String nombre : autores) {
+            int idAutor = autorDAO.obtenerOCrear(nombre.trim());
+            insertarArticuloAutor(idArticulo, idAutor);
+        }
+    }
+
+    // 4. Guardar palabras clave
+    if (articulo.getPalabrasTexto() != null
+            && !articulo.getPalabrasTexto().isBlank()) {
+
+        String[] palabras = articulo.getPalabrasTexto().split(",");
+
+        for (String palabra : palabras) {
+            int idPalabra = palabraDAO.obtenerOCrear(palabra.trim());
+            insertarArticuloPalabra(idArticulo, idPalabra);
+        }
+    }
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Artículo guardado correctamente",
+            "Éxito",
+            JOptionPane.INFORMATION_MESSAGE
+    );
+
+    ventanaAnterior.dispose();
+    dispose();
+}
 
 
     private void insertarArticuloAutor(int idArticulo, int idAutor) {
@@ -91,6 +129,21 @@ articulo.setResumen(txtResumen.getText());
             System.out.println("Error articulo_autor: " + e.getMessage());
         }
     }
+    
+    private void insertarArticuloPalabra(int idArticulo, int idPalabra) {
+    String sql = "INSERT INTO articulo_palabra_clave(id_articulo, id_palabra) VALUES (?, ?)";
+
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, idArticulo);
+        ps.setInt(2, idPalabra);
+        ps.executeUpdate();
+
+    } catch (SQLException e) {
+        System.out.println("Error articulo_palabra: " + e.getMessage());
+    }
+}
 
     private void cancelar() {
         int op = JOptionPane.showConfirmDialog(
