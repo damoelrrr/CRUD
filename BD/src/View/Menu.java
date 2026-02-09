@@ -58,9 +58,6 @@ public class Menu extends JFrame {
         JMenuItem itemCrear = new JMenuItem("Crear nuevo artículo");
         itemCrear.setActionCommand("articulo_crear");
 
-        JMenuItem itemVer = new JMenuItem("Ver artículos");
-        itemVer.setActionCommand("articulo_ver");
-
         JMenuItem itemActualizar = new JMenuItem("Actualizar artículo");
         itemActualizar.setActionCommand("articulo_actualizar");
 
@@ -72,7 +69,6 @@ public class Menu extends JFrame {
 
         menuArticulos.add(itemCrear);
         menuArticulos.addSeparator();
-        menuArticulos.add(itemVer);
         menuArticulos.add(itemBuscar);
         menuArticulos.addSeparator();
         menuArticulos.add(itemActualizar);

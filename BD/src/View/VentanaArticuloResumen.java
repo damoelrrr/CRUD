@@ -11,7 +11,6 @@ public class VentanaArticuloResumen extends JDialog {
 
     private JTextArea txtResumen;
     private JButton btnGuardar;
-    private JButton btnEditar;
     private JButton btnCancelar;
 
     private Articulo articulo;
@@ -34,57 +33,60 @@ public class VentanaArticuloResumen extends JDialog {
         panelTop.add(btnCancelar);
         add(panelTop, BorderLayout.NORTH);
 
+        // Área de resumen
         txtResumen = new JTextArea(10, 40);
         txtResumen.setLineWrap(true);
         txtResumen.setWrapStyleWord(true);
 
+        if (articulo.getResumen() != null) {
+            txtResumen.setText(articulo.getResumen());
+        }
+
         add(new JScrollPane(txtResumen), BorderLayout.CENTER);
 
-        btnEditar = new JButton("Editar información anterior");
+        // Botón guardar abajo
         btnGuardar = new JButton("Guardar");
-
-        btnEditar.addActionListener(e -> volver());
         btnGuardar.addActionListener(e -> guardar());
 
         JPanel panelBotones = new JPanel();
-        panelBotones.add(btnEditar);
         panelBotones.add(btnGuardar);
 
         add(panelBotones, BorderLayout.SOUTH);
     }
 
-    private void volver() {
-        ventanaAnterior.setVisible(true);
-        dispose();
-    }
-
+    // Guardar artículo completo
     private void guardar() {
 
         articulo.setResumen(txtResumen.getText());
 
-        // crear lla revista
+        // Obtener o crear revista
         RevistaDAO revistaDAO = new RevistaDAO();
         String nombreRevista = articulo.getRevista().getNombre();
         int idRevista = revistaDAO.obtenerOCrear(nombreRevista);
 
-      //️⃣ Asignar el ID REAL a la revista
         articulo.getRevista().setId(idRevista);
 
-        // 3️⃣ Guardar artículo
+        // Guardar artículo
         ArticuloDAO dao = new ArticuloDAO();
         dao.insertar(articulo);
 
         JOptionPane.showMessageDialog(this, "Artículo guardado correctamente");
-        dispose();
+
+        ventanaAnterior.dispose(); // cerrar ventana datos
+        dispose();                 // cerrar resumen
     }
 
+    // Cancelar y salir
     private void cancelar() {
-        int op = JOptionPane.showConfirmDialog(this,
+        int op = JOptionPane.showConfirmDialog(
+                this,
                 "Si sale se perderán los datos.\n¿Desea continuar?",
                 "Confirmación",
-                JOptionPane.YES_NO_OPTION);
+                JOptionPane.YES_NO_OPTION
+        );
 
         if (op == JOptionPane.YES_OPTION) {
+            ventanaAnterior.dispose();
             dispose();
         }
     }

@@ -3,6 +3,7 @@ package Controller;
 import Model.ArticuloDAO;
 import View.Menu;
 import View.VentanaArticuloDatos;
+import View.VentanaBuscarArticulos;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -112,6 +113,8 @@ public class Control {
 
     private void onArticuloBuscar() {
         // TODO: Llamar a métodos del modelo para buscar un artículo
+        new VentanaBuscarArticulos(menu).setVisible(true);
+
     }
 
     // ============ MÉTODOS PARA AUTORES ============
